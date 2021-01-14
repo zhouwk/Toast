@@ -8,21 +8,30 @@
 
 import UIKit
 
-let ToastDefaultPadding = CGFloat(15)
-let ToastItemDefaultMargin = CGFloat(5)
-let ToastKVOHiddenKeyPath = "hidden"
 let ToastKVOImageKeyPath = "image"
-
-let ToastDefaultBackgroundColor = UIColor.clear
-let ToastDefaultPrimaryColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1)
+let ToastRotateKeyPath = "transform.rotation.z"
 
 public class Toast: UIView {
         
     let foregroundBtn = UIButton()
     let contentView = UIView()
-    public let indicator = UIActivityIndicatorView(style: .white)
+
     public let imageView = UIImageView()
     public let label = UILabel()
+    public var autorotate = false {
+        didSet {
+            if !autorotate {
+                imageView.layer.removeAllAnimations()
+            } else if imageView.layer.animation(forKey: ToastRotateKeyPath) == nil {
+                let anim = CABasicAnimation(keyPath: ToastRotateKeyPath)
+                anim.toValue = CGFloat.pi * 2
+                anim.duration = ToastConfig.rotationDuration
+                anim.repeatCount = .infinity
+                anim.isRemovedOnCompletion = false
+                imageView.layer.add(anim, forKey: ToastRotateKeyPath)
+            }
+        }
+    }
     
     public var isUserInteractionBlocked = false {
         didSet {
@@ -34,15 +43,14 @@ public class Toast: UIView {
     var dismissWork: DispatchWorkItem?
     lazy var imageViewConstrants = [NSLayoutConstraint]()
     
-
+    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
     
     func setupUI() {
-        
-        contentView.backgroundColor = ToastDefaultBackgroundColor
+        contentView.backgroundColor = ToastConfig.backgroundColor
         contentView.layer.cornerRadius = 5
         addSubview(contentView)
         addConstraint(.init(item: contentView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
@@ -50,24 +58,22 @@ public class Toast: UIView {
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|->=50-[contentView]", options: [], metrics: nil, views: ["contentView": contentView]))
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|->=50-[contentView]", options: [], metrics: nil, views: ["contentView": contentView]))
         
-        for item in [indicator, imageView, label] {
+        for item in [imageView, label] {
             contentView.addSubview(item)
             contentView.addConstraint(.init(item: item, attribute: .centerX, relatedBy: .equal, toItem: contentView, attribute: .centerX, multiplier: 1, constant: 0))
-            addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|->=padding-[item]", options: [], metrics: ["padding": ToastDefaultPadding + 10], views: ["item": item]))
+            addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|->=padding-[item]", options: [], metrics: ["padding": ToastConfig.padding.x], views: ["item": item]))
         }
         
-        label.textColor = ToastDefaultPrimaryColor
+        label.textColor = ToastConfig.textColor
         label.font = UIFont.systemFont(ofSize: 14)
         label.numberOfLines = 0
-        itemsVerticalMargins = NSLayoutConstraint.constraints(withVisualFormat: "V:|-padding-[indicator][imageView][label]-padding-|", options: [], metrics: ["padding": ToastDefaultPadding], views: ["indicator": indicator, "imageView": imageView, "label": label])
+        itemsVerticalMargins = NSLayoutConstraint.constraints(withVisualFormat: "V:|-padding-[imageView][label]-padding-|", options: [], metrics: ["padding": ToastConfig.padding.y], views: [ "imageView": imageView, "label": label])
         contentView.addConstraints(itemsVerticalMargins)
-        
-        indicator.color = ToastDefaultPrimaryColor
-        indicator.addObserver(self, forKeyPath: ToastKVOHiddenKeyPath, options: .new, context: nil)
+    
         imageView.addObserver(self, forKeyPath: ToastKVOImageKeyPath, options: .new, context: nil)
         
         
-        for item in [foregroundBtn, contentView, indicator, imageView, label] {
+        for item in [foregroundBtn, contentView, imageView, label] {
             item.translatesAutoresizingMaskIntoConstraints = false
         }
     
@@ -78,8 +84,6 @@ public class Toast: UIView {
     }
     
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == ToastKVOHiddenKeyPath {
-        }
         if keyPath == ToastKVOImageKeyPath {
             if change?[.newKey] as? UIImage == nil {
                 if imageViewConstrants.isEmpty {
@@ -97,17 +101,8 @@ public class Toast: UIView {
     
         
     func relayoutItemsInVertial() {
-        
         let imageIntrinsicContentHeight = max(imageView.intrinsicContentSize.height, 0)
-        
-        // imageView-to-indicator
-        itemsVerticalMargins[1].constant = indicator.isHidden ? -indicator.intrinsicContentSize.height : (imageIntrinsicContentHeight == 0 ? 0 : ToastItemDefaultMargin)
-        
-        let labelIntrinsicContentHeight = max(label.intrinsicContentSize.height, 0)
-        // label-to-imageView
-        itemsVerticalMargins[2].constant = imageIntrinsicContentHeight == 0 ? 0 : (labelIntrinsicContentHeight == 0 ? 0 : ToastItemDefaultMargin)
-        
-        
+        itemsVerticalMargins[1].constant = imageIntrinsicContentHeight == 0 ? 0 : ToastConfig.itemMarginInV
     }
     
     
@@ -135,7 +130,6 @@ public class Toast: UIView {
     }
     
     deinit {
-        indicator.removeObserver(self, forKeyPath: ToastKVOHiddenKeyPath)
         imageView.removeObserver(self, forKeyPath: ToastKVOImageKeyPath)
     }
 }

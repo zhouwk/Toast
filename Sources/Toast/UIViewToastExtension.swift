@@ -13,7 +13,7 @@ extension UIView {
         return subviews.first { $0 is Toast } as? Toast
     }
         
-    public func showToast(_ text: String?,
+    public func showToast(_ text: String? = nil,
                           numberOfLines: Int = 1,
                           image: UIImage? = nil,
                           color: UIColor? = nil,
@@ -21,28 +21,31 @@ extension UIView {
         showBasicToast(text,
                        numberOfLines: numberOfLines,
                        image: image,
-                       animateIndicator: false,
+                       autorotate: false,
                        color: color,
                        bgColor: bgColor,
                        autoDismiss: true)
     }
 
-    public func showLoading(_ text: String?,
+    public func showLoading(_ text: String? = nil,
                             numberOfLines: Int = 1,
                             color: UIColor? = nil,
                             bgColor: UIColor? = nil) {
+        
+        let image = UIImage(named: "loading", in: .module, compatibleWith: nil)
         showBasicToast(text,
                        numberOfLines: numberOfLines,
-                       animateIndicator: true,
+                       image: image,
+                       autorotate: true,
                        color: color,
                        bgColor: bgColor,
                        isUserInteractionBlocked: true)
     }
     
-    public func showBasicToast(_ text: String?,
+    public func showBasicToast(_ text: String? = nil,
                                numberOfLines: Int = 1,
                                image: UIImage? = nil,
-                               animateIndicator: Bool = false,
+                               autorotate: Bool = false,
                                color: UIColor? = nil,
                                bgColor: UIColor? = nil,
                                autoDismiss: Bool = false,
@@ -59,15 +62,10 @@ extension UIView {
         toast.label.text = text
         toast.label.numberOfLines = numberOfLines
         toast.imageView.image = image
-        toast.label.textColor = color ?? ToastDefaultPrimaryColor
-        toast.indicator.color = color ?? ToastDefaultPrimaryColor
-        toast.contentView.backgroundColor = bgColor ?? ToastDefaultBackgroundColor
+        toast.label.textColor = color ?? ToastConfig.textColor
+        toast.contentView.backgroundColor = bgColor ?? ToastConfig.backgroundColor
         toast.isUserInteractionBlocked = isUserInteractionBlocked
-        if animateIndicator {
-            toast.indicator.startAnimating()
-        } else {
-            toast.indicator.stopAnimating()
-        }
+        toast.autorotate = autorotate
         if autoDismiss {
             toast.dismiss()
         }
@@ -81,7 +79,7 @@ extension UIViewController {
         return view.subviews.first { $0 is Toast } as? Toast
     }
 
-    public func showToast(_ text: String?,
+    public func showToast(_ text: String? = nil,
                           numberOfLines: Int = 1,
                           image: UIImage? = nil,
                           color: UIColor? = nil,
@@ -93,7 +91,7 @@ extension UIViewController {
                        bgColor: bgColor)
     }
 
-    public func showLoading(_ text: String?,
+    public func showLoading(_ text: String? = nil,
                             numberOfLines: Int = 1,
                             color: UIColor? = nil,
                             bgColor: UIColor? = nil) {

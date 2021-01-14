@@ -14,15 +14,15 @@
 # Usage
 ```
 let toast = Toast(frame: view.bounds)
-toast.indicator.startAnimating()
+toast.imageView.image = UIImage(named: "loading")
 toast.label.text = "loading..."
 toast.isUserInteractionBlocked = true
 view.addSubview(toast)
 
-
+toast.autorotate = true
 doSomework {
     toast.isUserInteractionBlocked = false
-    toast.indicator.stopAnimating()
+    toast.autorotate = false
     toast.imageView.image = UIImage(named: "done")
     toast.label.text = "this is a long text this is a long text this is a long text this is a long text this is a long text this is a long text this is a long text this is a long text this is a long text this is a long text "
     toast.label.numberOfLines = 2
