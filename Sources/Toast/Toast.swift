@@ -51,7 +51,7 @@ public class Toast: UIView {
     
     func setupUI() {
         contentView.backgroundColor = ToastConfig.backgroundColor
-        contentView.layer.cornerRadius = 5
+        contentView.layer.cornerRadius = ToastConfig.cornerRadius
         addSubview(contentView)
         addConstraint(.init(item: contentView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
         addConstraint(.init(item: contentView, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0))
@@ -111,7 +111,7 @@ public class Toast: UIView {
     }
     
     
-    public func dismiss(_ afterDelay: Double = 0.7) {
+    public func dismiss(_ afterDelay: Double = 0) {
         cancelDismissWork()
         dismissWork = DispatchWorkItem(block: { [weak self] in
             self?.removeFromSuperview()
