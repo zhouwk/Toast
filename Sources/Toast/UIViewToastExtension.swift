@@ -30,7 +30,7 @@ extension UIView {
     public func showLoading(_ text: String? = nil,
                             numberOfLines: Int = 1,
                             color: UIColor? = nil,
-                            bgColor: UIColor? = nil) {
+                            bgColor: UIColor = .clear) {
         
         let image = UIImage(named: "loading", in: .module, compatibleWith: nil)
         showBasicToast(text,
@@ -94,7 +94,7 @@ extension UIViewController {
     public func showLoading(_ text: String? = nil,
                             numberOfLines: Int = 1,
                             color: UIColor? = nil,
-                            bgColor: UIColor? = nil) {
+                            bgColor: UIColor = .clear) {
         view.showLoading(text,
                          numberOfLines: numberOfLines,
                          color: color,
