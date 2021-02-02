@@ -49,6 +49,7 @@ extension UIView {
                                color: UIColor? = nil,
                                bgColor: UIColor? = nil,
                                autoDismiss: Bool = false,
+                               dismissAfterDelay: TimeInterval = 0.7,
                                isUserInteractionBlocked: Bool = false) {
         let toast: Toast
         if self.toast != nil {
@@ -67,7 +68,7 @@ extension UIView {
         toast.isUserInteractionBlocked = isUserInteractionBlocked
         toast.autorotate = autorotate
         if autoDismiss {
-            toast.dismiss()
+            toast.dismiss(dismissAfterDelay)
         }
         toast.layoutIfNeeded()
     }
