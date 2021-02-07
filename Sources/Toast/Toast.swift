@@ -67,6 +67,7 @@ public class Toast: UIView {
         label.textColor = ToastConfig.textColor
         label.font = UIFont.systemFont(ofSize: 14)
         label.numberOfLines = 0
+        label.textAlignment = .center
         itemsVerticalMargins = NSLayoutConstraint.constraints(withVisualFormat: "V:|-padding-[imageView][label]-padding-|", options: [], metrics: ["padding": ToastConfig.padding.y], views: [ "imageView": imageView, "label": label])
         contentView.addConstraints(itemsVerticalMargins)
     
